@@ -90,7 +90,18 @@ def log_admin_audit(conn: sqlite3.Connection, admin_id: int, action: str, target
     """, (admin_id, action, target_entity, target_id, details))
     conn.commit()
 
-# --- HEALTH & DEMO STATUS ---
+# --- ROOT & HEALTH STATUS ---
+@app.get("/")
+def root():
+    return {
+        "service": "EcoSort Backend API",
+        "status": "online",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "health": "/api/health",
+        "message": "EcoSort API is running successfully! Visit /docs for the interactive API documentation."
+    }
+
 @app.get("/api/health")
 def health_check():
     return {
