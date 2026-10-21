@@ -60,17 +60,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Response was not JSON
+      }
       if (!res.ok) {
-        return { success: false, error: data.detail || 'Login failed' };
+        if (res.status === 404) {
+          return { success: false, error: 'API route not found (404). Check Render Static Site Rewrites or set VITE_API_BASE_URL.' };
+        }
+        if (res.status === 502 || res.status === 504) {
+          return { success: false, error: 'Backend is waking up from sleep. Please wait ~30 seconds and try again.' };
+        }
+        return { success: false, error: data.detail || `Login failed (${res.status})` };
       }
       localStorage.setItem('ecosort_token', data.access_token);
       setToken(data.access_token);
       setUser(data.user);
       setShowAuthModal(false);
       return { success: true };
-    } catch {
-      return { success: false, error: 'Network error connecting to EcoSort API' };
+    } catch (err: any) {
+      console.error('Login error:', err);
+      return { success: false, error: 'Network error connecting to EcoSort API. Please verify backend service is active.' };
     }
   };
 
@@ -81,17 +93,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(regData)
       });
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Response was not JSON
+      }
       if (!res.ok) {
-        return { success: false, error: data.detail || 'Registration failed' };
+        if (res.status === 404) {
+          return { success: false, error: 'API route not found (404). Check Render Static Site Rewrites or set VITE_API_BASE_URL.' };
+        }
+        if (res.status === 502 || res.status === 504) {
+          return { success: false, error: 'Backend is waking up from sleep. Please wait ~30 seconds and try again.' };
+        }
+        return { success: false, error: data.detail || `Registration failed (${res.status})` };
       }
       localStorage.setItem('ecosort_token', data.access_token);
       setToken(data.access_token);
       setUser(data.user);
       setShowAuthModal(false);
       return { success: true };
-    } catch {
-      return { success: false, error: 'Network error connecting to EcoSort API' };
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      return { success: false, error: 'Network error connecting to EcoSort API. Please verify backend service is active.' };
     }
   };
 
