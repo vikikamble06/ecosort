@@ -8,7 +8,7 @@ interface CategoryIconProps {
 }
 
 export const CategoryIcon: React.FC<CategoryIconProps> = ({ name, className = "w-5 h-5", size = 20 }) => {
- 
-  const IconComponent = Icons[name] || Icons.Recycle;
+  const IconMap = Icons as Record<string, any>;
+  const IconComponent = IconMap[name] || Icons.Recycle;
   return <IconComponent className={className} size={size} />;
 };
