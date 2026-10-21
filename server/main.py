@@ -41,6 +41,8 @@ app = FastAPI(
 )
 
 # CORS setup
+frontend_url = os.getenv("FRONTEND_URL", "").strip()
+
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -48,10 +50,13 @@ origins = [
     "http://localhost:8000",
     "http://127.0.0.1:8000"
 ]
+if frontend_url:
+    origins.append(frontend_url.rstrip("/"))
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"^https?:\/\/(localhost|127\.0\.0\.1|.*\.onrender\.com|.*\.vercel\.app)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
